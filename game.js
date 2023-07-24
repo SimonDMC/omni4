@@ -152,7 +152,7 @@ class Game {
                     return VALID_REACTIONS.includes(reaction.emoji.name) && (user.id === this.player1.id || user.id === this.player2.id);
                 };
 
-                const collector = responseMsg.createReactionCollector({ filter: collectorFilter });
+                const collector = responseMsg.createReactionCollector({ filter: collectorFilter, time: 600000 });
 
                 const game = this;
                 collector.on("collect", (reaction, user) => {
