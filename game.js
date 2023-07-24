@@ -39,8 +39,9 @@ class Game {
             this.board[lowestEmptyTile][column - 1] = this.signToPlay;
         }
 
-        if (this.checkWin()) {
-            this.printBoard(true);
+        const winData = this.checkWin();
+        if (winData) {
+            this.printBoard(winData);
             this.gameOver = true;
             return;
         }
@@ -53,9 +54,8 @@ class Game {
     checkWin() {
         for (let row = 0; row < this.board.length; row++) {
             for (let column = 0; column < this.board[0].length; column++) {
-                if (this.isWinAtCoordinates(row, column)) {
-                    return true;
-                }
+                const winData = this.isWinAtCoordinates(row, column);
+                if (winData) return winData;
             }
         }
         return false;
@@ -63,16 +63,18 @@ class Game {
 
     isWinAtCoordinates(row, column) {
         for (const winCase of cases) {
-            let localRow, localColumn;
-            [localRow, localColumn] = [row, column];
+            let row1, column1, row2, column2, row3, column3, row4, column4;
+            [row1, column1] = [row, column];
             const directionIndeces = winCase.split("");
-            if (this.getTileAtCoordinates(localRow, localColumn) != this.signToPlay) continue;
-            [localRow, localColumn] = this.addToCoordinatesFromDirectionIndex(localRow, localColumn, directionIndeces[0]);
-            if (this.getTileAtCoordinates(localRow, localColumn) != this.signToPlay) continue;
-            [localRow, localColumn] = this.addToCoordinatesFromDirectionIndex(localRow, localColumn, directionIndeces[1]);
-            if (this.getTileAtCoordinates(localRow, localColumn) != this.signToPlay) continue;
-            [localRow, localColumn] = this.addToCoordinatesFromDirectionIndex(localRow, localColumn, directionIndeces[2]);
-            if (this.getTileAtCoordinates(localRow, localColumn) == this.signToPlay) return true;
+            if (this.getTileAtCoordinates(row1, column1) != this.signToPlay) continue;
+            [row2, column2] = this.addToCoordinatesFromDirectionIndex(row1, column1, directionIndeces[0]);
+            if (this.getTileAtCoordinates(row2, column2) != this.signToPlay) continue;
+            [row3, column3] = this.addToCoordinatesFromDirectionIndex(row2, column2, directionIndeces[1]);
+            if (this.getTileAtCoordinates(row3, column3) != this.signToPlay) continue;
+            [row4, column4] = this.addToCoordinatesFromDirectionIndex(row3, column3, directionIndeces[2]);
+            if (this.getTileAtCoordinates(row4, column4) == this.signToPlay) {
+                return [row1, column1, row2, column2, row3, column3, row4, column4];
+            }
         }
     }
 
@@ -102,30 +104,39 @@ class Game {
         return lowestClearTile;
     }
 
-    async printBoard(showWinner) {
+    async printBoard(winData) {
+        if (winData) {
+            this.board[winData[0]][winData[1]] = 3;
+            this.board[winData[2]][winData[3]] = 3;
+            this.board[winData[4]][winData[5]] = 3;
+            this.board[winData[6]][winData[7]] = 3;
+        }
+
         let board = this.board.map((row) => row.join("")).join("\n");
+
         board = board.replace(/0/g, "⚪");
         board = board.replace(/1/g, "🔴");
         board = board.replace(/2/g, "🟡");
+        board = board.replace(/3/g, this.signToPlay == 1 ? "🟥" : "🟨");
         board += "\n1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣";
 
-        const exampleEmbed = new EmbedBuilder().setColor(0xc1bfff).setDescription(board);
+        const embed = new EmbedBuilder().setColor(0xc1bfff).setDescription(board);
 
-        if (showWinner) {
+        if (winData) {
             const winner = this.signToPlay == 1 ? this.player1 : this.player2;
             const loser = this.signToPlay == 1 ? this.player2 : this.player1;
-            exampleEmbed.setTitle(`Omni4 - ${winner.globalName} won against ${loser.globalName}!`);
+            embed.setTitle(`Omni4 - ${winner.globalName} won against ${loser.globalName}!`);
         } else {
-            exampleEmbed.setTitle(`Omni4 - ${this.player1.globalName} vs ${this.player2.globalName}`);
+            embed.setTitle(`Omni4 - ${this.player1.globalName} vs ${this.player2.globalName}`);
         }
 
         if (this.message) {
             this.interaction.editReply({
-                embeds: [exampleEmbed],
+                embeds: [embed],
             });
         } else {
             await this.interaction.reply({
-                embeds: [exampleEmbed],
+                embeds: [embed],
             });
             await this.interaction.fetchReply().then((responseMsg) => {
                 this.message = responseMsg;
