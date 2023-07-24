@@ -127,7 +127,11 @@ class Game {
             const loser = this.signToPlay == 1 ? this.player2 : this.player1;
             embed.setTitle(`Omni4 - ${winner.globalName} won against ${loser.globalName}!`);
         } else {
-            embed.setTitle(`Omni4 - ${this.player1.globalName} vs ${this.player2.globalName}`);
+            if (this.signToPlay == 1) {
+                embed.setTitle(`Omni4 - **${this.player1.globalName}** vs ${this.player2.globalName}`);
+            } else {
+                embed.setTitle(`Omni4 - ${this.player1.globalName} vs **${this.player2.globalName}**`);
+            }
         }
 
         if (this.message) {
