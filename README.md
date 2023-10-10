@@ -9,7 +9,7 @@ it allows lines in any direction (omnidirectional, hence the name).
 
 Below is a reference sheet of what counts as a 4-long line:
 
-![Omni4 Reference Sheet](https://cdn.discordapp.com/attachments/530358696505769985/1132966961127624784/omni4-reference-sheet.png)
+![Omni4 Reference Sheet](https://simondmc.com/media/imgs/misc/omni4-reference-sheet.png)
 
 ## How to play
 
